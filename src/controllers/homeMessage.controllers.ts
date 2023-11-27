@@ -11,17 +11,18 @@ import createToken from "../libs/createAccessToken.libs";
 
 export const postHomeMessage = async (req: Request, res: Response) => {
   const {username, message} = req.body;
-  const apiPerspectiveResponse = await apiPerspective(message);
-  const perspectiveResult = apiPerspectiveResponse.attributeScores.TOXICITY.summaryScore.value;
-
-  if (perspectiveResult > 0.6) {
-    return res.status(200).json({message: {
-      ES: "Mensaje ofensivo",
-      EN: "Offensive Message"
-    }})
-  }
-
+  
+  
   try {
+    const apiPerspectiveResponse = await apiPerspective(message);
+    const perspectiveResult = apiPerspectiveResponse.attributeScores.TOXICITY.summaryScore.value;
+    
+    if (perspectiveResult > 0.6) {
+      return res.status(403).json({message: {
+        ES: "Mensaje ofensivo",
+        EN: "Offensive Message"
+      }})
+    }
     // const queryResult = await postMessage(username, message);
     res.status(200).json({message: {
       ES: "Muchas gracias por tu mensaje!",
