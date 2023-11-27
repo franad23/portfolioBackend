@@ -7,7 +7,7 @@ const perspective = new Perspective({apiKey: process.env.API_KEY_PERSPECTIVEGOOG
 
 const apiPerspective = async (text) => {
   const result = await perspective.analyze(text);
-  return JSON.stringify(result, null, 2)
+  return result;
 }
 
 module.exports = apiPerspective;
