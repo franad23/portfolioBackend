@@ -6,6 +6,9 @@ import apiPerspective from "../helpers/perspectiveGoogle.js";
 //Queries
 import { postMessage } from "../database/queries";
 
+//Libs
+import createToken from "../libs/createAccessToken.libs";
+
 export const postHomeMessage = async (req: Request, res: Response) => {
   const {username, message} = req.body;
   const apiPerspectiveResponse = await apiPerspective(message);
@@ -24,6 +27,19 @@ export const postHomeMessage = async (req: Request, res: Response) => {
       ES: "Muchas gracias por tu mensaje!",
       EN: "Thank you for your message!"
     }})
+  } catch (error) {
+    res.status(500).json({message: "Error servidor"})
+  }
+}
+
+export const createAccessToken = async (req: Request, res: Response) => {
+  const {username} = req.body;
+  const token = await createToken(username, "1d");
+
+  try {
+    res.status(200).json({
+      token: token
+    })
   } catch (error) {
     res.status(500).json({message: "Error servidor"})
   }
