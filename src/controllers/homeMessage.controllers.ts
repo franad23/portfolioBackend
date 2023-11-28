@@ -11,8 +11,6 @@ import createToken from "../libs/createAccessToken.libs";
 
 export const postHomeMessage = async (req: Request, res: Response) => {
   const {username, message} = req.body;
-  
-  
   try {
     const apiPerspectiveResponse = await apiPerspective(message);
     const perspectiveResult = apiPerspectiveResponse.attributeScores.TOXICITY.summaryScore.value;
@@ -23,12 +21,13 @@ export const postHomeMessage = async (req: Request, res: Response) => {
         EN: "Offensive Message"
       }})
     }
-    // const queryResult = await postMessageQuery(username, message);
+    await postMessageQuery(username, message);
     res.status(200).json({message: {
       ES: "Muchas gracias por tu mensaje!",
       EN: "Thank you for your message!"
     }})
   } catch (error) {
+    console.log(error);
     res.status(500).json({message: "Error servidor"})
   }
 }
