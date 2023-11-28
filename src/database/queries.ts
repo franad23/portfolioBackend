@@ -23,7 +23,7 @@ export const linkShortenerQuery = async (original: string, newLink: string) => {
 }
 
 export const findLinkIfExistsQuery = async (link: string) => {
-  const queryResult = await pool.query(`SELECT * FROM ${process.env.DB_LINKTABLE} WHERE shorted_link = $1`, [link]);
+  const queryResult = await pool.query(`SELECT * FROM ${process.env.DB_LINKTABLE} WHERE original_link = $1`, [link]);
   return queryResult;
 }
 

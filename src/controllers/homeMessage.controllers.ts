@@ -65,7 +65,12 @@ export const getFirstTenMessages = async (req: Request, res: Response) => {
 }
 
 export const linkShortener = async (req: Request, res: Response) => {
-  const link = req.body.link;
+  let link = req.body.link;
+  const regex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
+  
+  if (!regex.test(link)) {
+    link = `http://${link}`;
+  }
   try {
     const {status} = await axios.head(link);
     if (status >= 200 && status <= 300) {
@@ -82,15 +87,22 @@ export const linkShortener = async (req: Request, res: Response) => {
         }) 
       }   
         else {
-      res.status(404).json({ message: 'La página no existe o no está disponible' });
+      res.status(404).json({ message: {
+        ES: "La página no existe o no está disponible",
+        EN: "The page does not exist or is not available"
+      } });
     }
     
   } catch (error) {
+    console.log(error);
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError;
       if (axiosError.code === 'ENOTFOUND') {
         // La dirección IP del dominio no se pudo resolver
-        res.status(404).json({ message: 'La página no existe o no está disponible' });
+        res.status(404).json({ message: {
+          ES: "La página no existe o no está disponible",
+          EN: "The page does not exist or is not available"
+        } });
       } else {
         // Otro tipo de error en la solicitud HEAD
         res.status(500).json({ message: 'Error al verificar la página' });

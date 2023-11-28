@@ -3,7 +3,8 @@ import cors from "cors";
 import morgan from "morgan";
 
 //Routes
-import homeMessageRoutes from "./routes/homeMessages.routes"
+import homeMessageRoutes from "./routes/homeMessages.routes";
+import helpersRoutes from "./helpers/pexelsaapi";
 
 const app = express();
 
@@ -15,5 +16,6 @@ app.use(cors({
 app.use(morgan("dev"));
 
 app.use("/api", homeMessageRoutes);
+app.use("/api", helpersRoutes);
 
 export default app;
