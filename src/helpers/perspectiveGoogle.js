@@ -6,8 +6,12 @@ dotenv.config();
 const perspective = new Perspective({apiKey: process.env.API_KEY_PERSPECTIVEGOOGLE });
 
 const apiPerspective = async (text) => {
-  const result = await perspective.analyze(text);
-  return result;
+  try {
+    const result = await perspective.analyze(text);
+    return result;
+  } catch (error) {
+    return error
+  }
 }
 
 module.exports = apiPerspective;
