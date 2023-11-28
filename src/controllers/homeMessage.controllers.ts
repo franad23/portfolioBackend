@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from 'uuid';
+import axios, {AxiosError} from "axios";
 
 //Helpers
 import apiPerspective from "../helpers/perspectiveGoogle.js";
@@ -65,21 +66,39 @@ export const getFirstTenMessages = async (req: Request, res: Response) => {
 
 export const linkShortener = async (req: Request, res: Response) => {
   const link = req.body.link;
-  const newLink = `http://localhost:5173/${uuidv4().slice(0,8)}` ;
   try {
-    const {rows} = await findLinkIfExistsQuery(link);
-    if(rows.length !== 0) return res.status(200).json({
-      linkShortened: rows[0].shorted_link
-    })
+    const {status} = await axios.head(link);
+    if (status >= 200 && status <= 300) {
+      const newLink = `http://localhost:5173/${uuidv4().slice(0,8)}` ;
 
-    await linkShortenerQuery(link, newLink);
-    res.status(200).json({
-      linkShortened: newLink,
-    })
-
+        const {rows} = await findLinkIfExistsQuery(link);
+        if(rows.length !== 0) return res.status(200).json({
+          linkShortened: rows[0].shorted_link
+        })
+    
+        await linkShortenerQuery(link, newLink);
+        res.status(200).json({
+          linkShortened: newLink,
+        }) 
+      }   
+        else {
+      res.status(404).json({ message: 'La página no existe o no está disponible' });
+    }
+    
   } catch (error) {
-    console.log(error);
-    res.status(500).json({message: "Error servidor"})
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      if (axiosError.code === 'ENOTFOUND') {
+        // La dirección IP del dominio no se pudo resolver
+        res.status(404).json({ message: 'La página no existe o no está disponible' });
+      } else {
+        // Otro tipo de error en la solicitud HEAD
+        res.status(500).json({ message: 'Error al verificar la página' });
+      }
+    } else {
+      // Manejo de otros tipos de error
+      res.status(500).json({ message: 'Error interno del servidor' });
+    }
   }
 }
 
