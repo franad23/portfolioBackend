@@ -5,7 +5,12 @@ import { v4 as uuidv4 } from 'uuid';
 import apiPerspective from "../helpers/perspectiveGoogle.js";
 
 //Queries
-import { postMessageQuery, getLastTenMessagesQuery, linkShortenerQuery, findLinkIfExists } from "../database/queries";
+import { 
+  postMessageQuery, 
+  getLastTenMessagesQuery, 
+  linkShortenerQuery, 
+  findLinkIfExistsQuery, 
+  getAllCountLinksQuery } from "../database/queries";
 
 //Libs
 import createToken from "../libs/createAccessToken.libs";
@@ -62,7 +67,7 @@ export const linkShortener = async (req: Request, res: Response) => {
   const link = req.body.link;
   const newLink = `http://localhost:5173/${uuidv4().slice(0,8)}` ;
   try {
-    const {rows} = await findLinkIfExists(link);
+    const {rows} = await findLinkIfExistsQuery(link);
     if(rows.length !== 0) return res.status(200).json({
       linkShortened: rows[0].shorted_link
     })
@@ -72,6 +77,17 @@ export const linkShortener = async (req: Request, res: Response) => {
       linkShortened: newLink,
     })
 
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({message: "Error servidor"})
+  }
+}
+
+export const getAllCountLinks = async (req: Request, res: Response) => {
+  try {
+    const {rows} = await getAllCountLinksQuery();
+    console.log(rows);
+    res.status(200).json(rows)
   } catch (error) {
     console.log(error);
     res.status(500).json({message: "Error servidor"})

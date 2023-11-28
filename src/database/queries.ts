@@ -22,7 +22,12 @@ export const linkShortenerQuery = async (original: string, newLink: string) => {
   ])
 }
 
-export const findLinkIfExists = async (link: string) => {
+export const findLinkIfExistsQuery = async (link: string) => {
   const queryResult = await pool.query(`SELECT * FROM ${process.env.DB_LINKTABLE} WHERE shorted_link = $1`, [link]);
+  return queryResult;
+}
+
+export const getAllCountLinksQuery = async () => {
+  const queryResult = await pool.query(`SELECT COUNT(*) FROM ${process.env.DB_LINKTABLE}`);
   return queryResult;
 }
